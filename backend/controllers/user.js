@@ -2,8 +2,11 @@ const bcrypt = require ('bcrypt');
 const User = require ('../models/user');
 const jwt = require('jsonwebtoken');
 
-
 exports.signup = (req, res, next) => {
+    /* mot de passe doit contenir 8 caractères, 1 Majuscule, 1 chiffre et un caractère spécial sans espace */
+    let validInput = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (validInput.test(req.body.password) === true){
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new User({
@@ -15,6 +18,9 @@ exports.signup = (req, res, next) => {
           .catch(error => res.status(400).json({ error }));
       })
       .catch(error => res.status(500).json({ error }));
+    } else {
+      res.status(500).json({message:"mot de passe doit contenir 8 caractères, 1 Majuscule, 1 chiffre et un caractère spécial sans espace"})  
+    }
   };
 
   exports.login = (req, res, next) => {
