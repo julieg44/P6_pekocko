@@ -3,12 +3,9 @@ const fs = require('fs');
 const user = require ('../models/user');
 
 
-
 exports.createSauce = (req, res, next) => {
-
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
-
   const sauce = new Sauce({
     ...sauceObject,
     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
@@ -18,12 +15,10 @@ exports.createSauce = (req, res, next) => {
     .catch(error => res.status(400).json({ error }));  
 };
 
-
 exports.modifySauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
   .then( sauce => { 
     const filename = sauce.imageUrl.split('/images/')[1];
-
     fs.unlink(`images/${filename}`, () => {
       Sauce.deleteOne({ imageUrl: req.params.imageUrl })
       .then(() => res.status(200).json({ message: 'image supprimé !'}))
@@ -58,8 +53,6 @@ exports.getOneSauce = (req, res, next) => {
       .catch(error => res.status(404).json({ error }));
 };
 
-
-
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
@@ -73,12 +66,9 @@ exports.deleteSauce = (req, res, next) => {
     .catch(error => res.status(500).json({ error }));
 };
 
-
-
 exports.likeSauce = (req, res, next) => {
   const likeClicked = req.body.like
   const userId = req.body.userId
-
   Sauce.findOne({ _id: req.params.id })
     .then (sauce => {
         if (likeClicked === 1){
@@ -114,7 +104,6 @@ exports.likeSauce = (req, res, next) => {
               return Id !== userId
           });
           }
-          
           Sauce.updateOne({ _id: req.params.id }, { 'likes':sauce.likes, 'dislikes': sauce.dislikes, 'usersLiked': sauce.usersLiked, 'usersDisliked': sauce.usersDisliked, _id: req.params.id})
         
           .then (() => res.status(200).json({message:'like or dislike remove !'}))
@@ -122,7 +111,6 @@ exports.likeSauce = (req, res, next) => {
 
         res.status(200).json({message:"sauce updated"})  
         }
-    
   })
   .catch(error => res.status(500).json({'Oh non': error}));
 } 
